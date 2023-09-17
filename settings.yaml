@@ -1,0 +1,8 @@
+# https://docs.iterative.ai/PyDrive2/oauth/
+client_config_file: ./config/client_secrets.json
+
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: ./config/saved_credentials.json
+
+get_refresh_token: True
