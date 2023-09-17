@@ -12,4 +12,4 @@
 
 1. Google Drive APIを有効化し，認証情報を取得する．
 2. configディレクトリを作成し，認証情報のJSONファイルを`config/client_secrets.json`として保存する．
-3. Authentication.pyを実行し，認証を行う．
+3. authentication.pyを実行し，認証を行う．
