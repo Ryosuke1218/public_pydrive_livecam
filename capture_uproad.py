@@ -12,8 +12,11 @@ import schedule
 import threading
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
+import pyautogui
+from PIL import Image
 
 FILE_ID = '***'
+
 
 # 文字背景の透過処理
 def add_text_to_image(img, text):
@@ -24,6 +27,7 @@ def add_text_to_image(img, text):
     cv2.putText(weighted_img, text=text, org=(10, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(0, 0, 0), thickness=2, lineType=cv2.LINE_AA)
     return weighted_img
 
+
 def capture_uproad(drive_instance, cap_instance):
     # 時間計測
     time_start = time.perf_counter()
@@ -31,28 +35,30 @@ def capture_uproad(drive_instance, cap_instance):
 
     # オートフォーカスやホワイトバランスの調整時間を考慮して、5秒間キャプチャを続ける
     while diff_time < 5:
-        _, source = cap_instance.read()
+        cap_instance.screenshot("source.png")
 
         time_now = time.perf_counter()
         diff_time = time_now - time_start
 
-    # 画像に日付と時間を追加
-    dt_now = datetime.datetime.now()
-    dt_str = dt_now.strftime('%Y/%m/%d %H:%M:%S')
-    weighted_image = add_text_to_image(source, dt_str)
+    # # 画像に日付と時間を追加
+    # dt_now = datetime.datetime.now()
+    # dt_str = dt_now.strftime('%Y/%m/%d %H:%M:%S')
+    # weighted_image = add_text_to_image(source, dt_str)
 
-    # 画像を保存
-    cv2.imwrite('source.png', weighted_image)
+    # # 画像を保存
+    # cap_instance.save(source)
 
     # Google Driveにアップロード
     file_1 = drive_instance.CreateFile({'id': FILE_ID})
-    file_1.SetContentFile('./source.png')
+    file_1.SetContentFile('source.png')
     file_1.Upload()
-    print('{} Upload file to Google Drive' .format(dt_str))
+    print('{} Upload file to Google Drive')
+
 
 def run_threaded(drive_instance, cap_instance):
     job_thread = threading.Thread(target=capture_uproad, args=(drive_instance, cap_instance))
     job_thread.start()
+
 
 def main():
     # Google Driveへの接続
@@ -60,13 +66,15 @@ def main():
     gauth.LocalWebserverAuth()
     drive = GoogleDrive(gauth)
 
-    # カメラの起動
-    cap = cv2.VideoCapture(1)
+    # # カメラの起動
+    # cap = cv2.VideoCapture(1)
 
-    # カメラの設定
-    print(cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280))
-    print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # # カメラの設定
+    # print(cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280))
+    # print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    # print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    cap = pyautogui
 
     # 現在の画像をアップロード
     capture_uproad(drive_instance=drive, cap_instance=cap)
@@ -78,6 +86,7 @@ def main():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
 if __name__ == '__main__':
     main()
